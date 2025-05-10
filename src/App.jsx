@@ -40,8 +40,15 @@ const App = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   
-  // Handle view navigation
+  // Handle view navigation with authentication check
   const handleViewChange = (view) => {
+    // Check if user is trying to access a protected view while not authenticated
+    if ((view === 'analyze' || view === 'insights') && !isAuthenticated) {
+      // Show login dialog instead
+      setLoginOpen(true);
+      return;
+    }
+    
     setCurrentView(view);
     setError('');
   };
@@ -86,6 +93,13 @@ const App = () => {
   const handleStartAnalysis = async () => {
     if (!selectedFile) {
       setError('Please select a file first');
+      return;
+    }
+    
+    // Check if user is authenticated before proceeding
+    if (!isAuthenticated) {
+      setError('Please log in to analyze conversations');
+      setLoginOpen(true);
       return;
     }
     

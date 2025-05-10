@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import LoginDialog from './auth/LoginDialog';
 import {
   Typography,
   Box,
@@ -31,10 +32,20 @@ const AnalysisView = ({
   uploadProgress,
   fileInputRef
 }) => {
-  const { subscription } = useAuth();
+  const { isAuthenticated, subscription } = useAuth();
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   
   // Check if user has reached their quota
   const hasReachedQuota = subscription && subscription.usage >= subscription.quota;
+  
+  const handleLoginOpen = () => {
+    setLoginDialogOpen(true);
+  };
+  
+  const handleLoginClose = () => {
+    setLoginDialogOpen(false);
+  };
+  
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       <Card sx={{ maxWidth: '768px', width: '100%' }}>
@@ -43,6 +54,39 @@ const AnalysisView = ({
           titleTypographyProps={{ align: 'center' }}
         />
         <CardContent>
+          {/* Authentication Banner - show only when not authenticated */}
+          {!isAuthenticated && (
+            <Box 
+              sx={{ 
+                p: 3, 
+                mb: 3, 
+                bgcolor: '#fff8e1', 
+                borderRadius: 2,
+                border: '1px solid #ffd54f',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center'
+              }}
+            >
+              <Typography variant="h5" sx={{ mb: 1, color: '#f57c00' }}>
+                Authentication Required
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                You need to be logged in to upload and analyze conversations. 
+                This ensures your data remains secure and associated with your account.
+              </Typography>
+              <Button 
+                variant="contained" 
+                color="primary"
+                size="large"
+                onClick={handleLoginOpen}
+              >
+                Log In Now
+              </Button>
+            </Box>
+          )}
+          
           {/* Hidden file input */}
           <input
             type="file"
@@ -160,30 +204,30 @@ const AnalysisView = ({
               )}
               
               <Box sx={{ textAlign: 'right' }}>
-              {hasReachedQuota ? (
-                <Box sx={{ textAlign: 'center', mb: 2 }}>
-                  <Typography variant="body2" color="error" sx={{ mb: 1 }}>
-                    You've reached your monthly quota. Please upgrade your plan to continue.
-                  </Typography>
+                {hasReachedQuota ? (
+                  <Box sx={{ textAlign: 'center', mb: 2 }}>
+                    <Typography variant="body2" color="error" sx={{ mb: 1 }}>
+                      You've reached your monthly quota. Please upgrade your plan to continue.
+                    </Typography>
+                    <Button 
+                      variant="contained" 
+                      color="primary"
+                      onClick={() => window.open('https://yourstore.lemonsqueezy.com/checkout/buy/basic-plan-id', '_blank')}
+                    >
+                      Upgrade Plan
+                    </Button>
+                  </Box>
+                ) : (
                   <Button 
                     variant="contained" 
-                    color="primary"
-                    onClick={() => window.open('https://yourstore.lemonsqueezy.com/checkout/buy/basic-plan-id', '_blank')}
+                    color="primary" 
+                    onClick={onStartAnalysis}
+                    startIcon={<BarChart />}
+                    disabled={loading}
                   >
-                    Upgrade Plan
+                    {loading ? 'Processing...' : 'Analyze Conversation'}
                   </Button>
-                </Box>
-              ) : (
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  onClick={onStartAnalysis}
-                  startIcon={<BarChart />}
-                  disabled={loading}
-                >
-                  {loading ? 'Processing...' : 'Analyze Conversation'}
-                </Button>
-              )}
+                )}
               </Box>
             </Box>
           )}
@@ -300,6 +344,9 @@ const AnalysisView = ({
           )}
         </CardContent>
       </Card>
+      
+      {/* Login dialog */}
+      <LoginDialog open={loginDialogOpen} onClose={handleLoginClose} />
     </Box>
   );
 };
