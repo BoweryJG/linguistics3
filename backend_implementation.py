@@ -7,6 +7,7 @@ import jwt
 from supabase import create_client
 from datetime import datetime, timedelta
 import json
+import openai
 from pydantic import BaseModel
 
 # Initialize FastAPI app
@@ -30,9 +31,14 @@ supabase = create_client(supabase_url, supabase_key)
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
+# Initialize OpenAI
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
 # Define models
 class AudioRequest(BaseModel):
     filename: str
+    transcription_url: str = None
+    duration_seconds: int = None
 
 class UserLimit(BaseModel):
     tier: str = "free"
@@ -183,6 +189,17 @@ async def handle_subscription_deleted(event):
 async def root():
     return {"message": "Audio Analysis API is running"}
 
+@app.get("/health")
+async def health():
+    """Health check endpoint that doesn't require authentication"""
+    return {
+        "status": "ok",
+        "version": "1.0.0",
+        "openai_configured": bool(openai.api_key),
+        "supabase_configured": bool(supabase_url and supabase_key),
+        "stripe_configured": bool(stripe.api_key)
+    }
+
 @app.post("/webhook")
 async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user)):
     try:
@@ -204,16 +221,52 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
         # Log the usage
         await log_usage(user_id, "audio_analysis", file_size)
         
-        # Your existing audio processing logic goes here
-        # For now, just return a success message
-        return {
-            "message": "Processing started",
-            "user_id": user_id,
-            "usage": {
-                "current": current_usage + 1,
-                "limit": limits["monthly_quota"]
+        # Process the audio file with OpenAI
+        try:
+            # Step 1: Transcribe the audio using OpenAI's Whisper API
+            print(f"Transcribing audio file: {filename}")
+            
+            # The filename should be a URL to the audio file in Supabase storage
+            transcription_response = openai.Audio.transcribe(
+                model="whisper-1",
+                file=filename,
+                response_format="text"
+            )
+            
+            # Step 2: Analyze the transcription using OpenAI's GPT-4
+            print("Analyzing transcription with GPT-4")
+            analysis_prompt = f"Analyze the following conversation transcript for a sales call:\n\n{transcription_response}\n\nProvide insights on:"
+            analysis_prompt += "\n1. Key points discussed\n2. Customer pain points\n3. Objections raised\n4. Next steps\n5. Overall sentiment"
+            
+            analysis_response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are an expert sales conversation analyzer."},
+                    {"role": "user", "content": analysis_prompt}
+                ]
+            )
+            
+            analysis_text = analysis_response.choices[0].message.content
+            
+            # Step 3: Store the results in Supabase
+            # This would be implemented based on your Supabase schema
+            
+            return {
+                "message": "Processing completed successfully",
+                "user_id": user_id,
+                "transcription": transcription_response[:100] + "...",  # Truncated for response
+                "analysis_summary": analysis_text[:100] + "...",  # Truncated for response
+                "usage": {
+                    "current": current_usage + 1,
+                    "limit": limits["monthly_quota"]
+                }
             }
-        }
+        except Exception as e:
+            print(f"Error processing audio with OpenAI: {str(e)}")
+            return JSONResponse(
+                status_code=500,
+                content={"message": f"Error processing audio with OpenAI: {str(e)}"}
+            )
     except Exception as e:
         return JSONResponse(
             status_code=500,
