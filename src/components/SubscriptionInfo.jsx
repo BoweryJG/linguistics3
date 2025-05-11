@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Button, Paper, Chip, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useAuth } from '../contexts/AuthContext';
+// Removed useAuth import - using hardcoded values instead
 
 // Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -35,11 +35,13 @@ const TierChip = styled(Chip)(({ theme, tier }) => ({
 }));
 
 const SubscriptionInfo = () => {
-  const { subscription, usageData, fetchUsageData } = useAuth();
-
-  if (!subscription) {
-    return null;
-  }
+  // Hardcoded subscription data - no longer using context
+  const subscription = {
+    tier: 'premium',
+    quota: 1000,
+    usage: 0,
+    resetDate: null
+  };
 
   const { tier, quota, usage, resetDate } = subscription;
   const usagePercentage = Math.min(Math.round((usage / quota) * 100), 100);

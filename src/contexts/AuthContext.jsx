@@ -4,142 +4,90 @@ import api from '../api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [subscription, setSubscription] = useState(null);
-  const [usageData, setUsageData] = useState(null);
-  const [session, setSession] = useState(null);
+  // Always set isAuthenticated to true and provide default user data
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [user, setUser] = useState({
+    id: 'default-user-id',
+    name: 'Default User',
+    email: 'user@example.com'
+  });
+  const [loading, setLoading] = useState(false);
+  const [subscription, setSubscription] = useState({
+    tier: 'premium',
+    quota: 1000,
+    usage: 0,
+    resetDate: null
+  });
+  const [usageData, setUsageData] = useState({
+    tier: 'premium',
+    quota: 1000,
+    usage: 0,
+    reset_date: null
+  });
+  const [session, setSession] = useState({ access_token: 'mock-token' });
   const [error, setError] = useState(null);
   
-  // Check auth status on initial render
+  // Initialize with default values
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { authenticated, user } = await api.checkAuthStatus();
-        setIsAuthenticated(authenticated);
-        setUser(user);
-        
-        if (authenticated && user) {
-          // Fetch subscription data
-          fetchUsageData();
-        } else {
-          // Set default values if not authenticated
-          setSubscription({
-            tier: 'free',
-            quota: 10,
-            usage: 0,
-            resetDate: null
-          });
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        // Set default values on error
-        setSubscription({
-          tier: 'free',
-          quota: 10,
-          usage: 0,
-          resetDate: null
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkAuth();
+    setLoading(false);
   }, []);
   
-  // Fetch user's usage data
+  // Mock function that returns default usage data
   const fetchUsageData = async () => {
-    try {
-      // Try to get usage data from the API
-      let data;
-      
-      try {
-        // First try with CORS proxy
-        data = await api.getUserUsage();
-      } catch (proxyError) {
-        console.log('Failed to fetch usage with CORS proxy, trying direct method');
-        try {
-          // If CORS proxy fails, try direct method
-          data = await api.getUserUsageDirectly();
-        } catch (directError) {
-          console.log('Failed to fetch usage directly, using mock data');
-          // If both methods fail, use mock data
-          data = await api.getMockUserUsage();
-        }
-      }
-      
-      setUsageData(data);
-      setSubscription({
-        tier: data.tier,
-        quota: data.quota,
-        usage: data.usage,
-        resetDate: data.reset_date
-      });
-    } catch (error) {
-      console.error('All methods to fetch usage data failed:', error);
-      // Set default values if we can't fetch from the server
-      setSubscription({
-        tier: 'free',
-        quota: 10,
-        usage: 0,
-        resetDate: null
-      });
-    }
+    console.log('Mock fetchUsageData called');
+    // No actual API call, just use default values
+    const data = {
+      tier: 'premium',
+      quota: 1000,
+      usage: 0,
+      reset_date: null
+    };
+    
+    setUsageData(data);
+    setSubscription({
+      tier: data.tier,
+      quota: data.quota,
+      usage: data.usage,
+      resetDate: data.reset_date
+    });
+    
+    return data;
   };
   
+  // Mock login function that always succeeds
   const login = async (credentials) => {
-    try {
-      setLoading(true);
-      const userData = { email: credentials.email };
-      const data = await api.authenticate(credentials.password, userData);
-      setUser(data.user);
-      setSession(data.session);
-      setIsAuthenticated(true);
-      setError(null);
-      localStorage.setItem('lastEmail', credentials.email);
-      // Store the token for API calls
-      if (data.session) {
-        localStorage.setItem('authToken', data.session.access_token);
-        // Fetch user's usage data immediately after login
-        await fetchUsageData();
-      }
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(error.message || 'An error occurred during login');
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    console.log('Mock login called with:', credentials);
+    // No actual authentication, just return success
+    return { 
+      success: true,
+      user: {
+        id: 'default-user-id',
+        name: 'Default User',
+        email: credentials.email || 'user@example.com'
+      },
+      session: { access_token: 'mock-token' }
+    };
   };
   
+  // Mock signup function that always succeeds
   const signup = async (userData) => {
-    try {
-      const { user } = await api.register(userData);
-      setIsAuthenticated(true);
-      setUser(user);
-      fetchUsageData();
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    console.log('Mock signup called with:', userData);
+    // No actual registration, just return success
+    return { 
+      success: true,
+      user: {
+        id: 'default-user-id',
+        name: userData.name || 'Default User',
+        email: userData.email || 'user@example.com'
+      }
+    };
   };
   
+  // Mock logout function that does nothing
   const logout = async () => {
-    try {
-      if (api.supabase) {
-        await api.supabase.auth.signOut();
-      }
-      setIsAuthenticated(false);
-      setUser(null);
-      setSubscription(null);
-      setUsageData(null);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    console.log('Mock logout called');
+    // No actual logout, just return success
+    return { success: true };
   };
   
   return (

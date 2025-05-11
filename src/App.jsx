@@ -40,15 +40,9 @@ const App = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   
-  // Handle view navigation with authentication check
+  // Handle view navigation without authentication check
   const handleViewChange = (view) => {
-    // Check if user is trying to access a protected view while not authenticated
-    if ((view === 'analyze' || view === 'insights') && !isAuthenticated) {
-      // Show login dialog instead
-      setLoginOpen(true);
-      return;
-    }
-    
+    // No authentication check needed anymore
     setCurrentView(view);
     setError('');
   };
@@ -96,12 +90,7 @@ const App = () => {
       return;
     }
     
-    // Check if user is authenticated before proceeding
-    if (!isAuthenticated) {
-      setError('Please log in to analyze conversations');
-      setLoginOpen(true);
-      return;
-    }
+    // No authentication check needed anymore
     
     setLoading(true);
     setError('');
@@ -497,71 +486,34 @@ const App = () => {
               {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
             
-            {/* Auth section */}
-            {isAuthenticated ? (
-              // Logged in - show avatar
-              <Avatar 
-                onClick={handleUserMenuOpen}
-                sx={{ 
-                  bgcolor: isDarkMode ? 'primary.main' : '#ede9fe', 
-                  color: isDarkMode ? 'white' : 'primary.main', 
-                  width: '2rem', 
-                  height: '2rem', 
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': {
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    transform: 'scale(1.1)',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                  }
-                }}
-              >
-                {getInitials(user?.name)}
-              </Avatar>
-            ) : (
-              // Not logged in - show buttons
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button 
-                  variant="outlined" 
-                  size="small"
-                  onClick={handleLoginOpen}
-                  sx={{
-                    borderRadius: '20px',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                >
-                  Log In
-                </Button>
-                <Button 
-                  variant="contained" 
-                  size="small"
-                  onClick={handleSignupOpen}
-                  sx={{
-                    borderRadius: '20px',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </Box>
-            )}
+          {/* Always show avatar - no auth section needed */}
+          <Avatar 
+            onClick={handleUserMenuOpen}
+            sx={{ 
+              bgcolor: isDarkMode ? 'primary.main' : '#ede9fe', 
+              color: isDarkMode ? 'white' : 'primary.main', 
+              width: '2rem', 
+              height: '2rem', 
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                bgcolor: 'primary.main',
+                color: 'white',
+                transform: 'scale(1.1)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }
+            }}
+          >
+            {getInitials(user?.name)}
+          </Avatar>
           </Box>
         </Toolbar>
       </AppBar>
 
       <Container sx={{ py: 4, flex: 1 }}>
-        {/* Subscription Info - Only show when authenticated */}
-        {isAuthenticated && currentView !== 'complete' && (
+        {/* Subscription Info - Always show */}
+        {currentView !== 'complete' && (
           <React.Suspense fallback={<div>Loading subscription info...</div>}>
             {/* Lazy load the SubscriptionInfo component */}
             {React.createElement(React.lazy(() => import('./components/SubscriptionInfo')))}
@@ -610,9 +562,9 @@ const App = () => {
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
       
-      {/* Auth dialogs */}
-      <LoginDialog open={loginOpen} onClose={handleLoginClose} />
-      <SignupDialog open={signupOpen} onClose={handleSignupClose} />
+      {/* Auth dialogs - hidden but kept for compatibility */}
+      <LoginDialog open={false} onClose={handleLoginClose} />
+      <SignupDialog open={false} onClose={handleSignupClose} />
     </Box>
   );
 };

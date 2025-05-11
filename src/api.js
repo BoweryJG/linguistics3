@@ -158,52 +158,23 @@ export async function logActivity(activity) {
 }
 
 /**
- * Get user token from Supabase session
+ * Get user token from Supabase session - REMOVED AUTHENTICATION
  * @returns {Promise<string|null>} The JWT token
  */
 export async function getUserToken() {
-  if (!supabase) return null;
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || null;
-  } catch (error) {
-    console.error('Error getting user token:', error);
-    return null;
-  }
+  console.log('Authentication disabled - returning mock token');
+  return 'mock-token';
 }
 
 /**
- * Include authorization header in API requests
- * @returns {Promise<Object>} Headers object with Authorization
+ * Include authorization header in API requests - REMOVED AUTHENTICATION
+ * @returns {Promise<Object>} Headers object without Authorization
  */
 export async function getAuthHeaders() {
-  const headers = {
+  // Return only content-type header without authentication
+  return {
     'Content-Type': 'application/json',
   };
-  
-  // Check for token in localStorage first
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    console.log('Using token from localStorage');
-    headers['Authorization'] = `Bearer ${token}`;
-    return headers;
-  }
-  
-  // If no token in localStorage, try to get from Supabase session
-  try {
-    const sessionToken = await getUserToken();
-    if (sessionToken) {
-      console.log('Using token from Supabase session');
-      headers['Authorization'] = `Bearer ${sessionToken}`;
-    } else {
-      console.log('No authentication token available. Proceeding without Authorization header.');
-    }
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    console.log('Proceeding without Authorization header due to error.');
-  }
-  
-  return headers;
 }
 
 /**
@@ -248,120 +219,55 @@ export async function getUserUsage() {
 }
 
 /**
- * Check user authentication status
+ * Check user authentication status - REMOVED AUTHENTICATION
  * @returns {Promise<Object>} - The authentication status
  */
 export async function checkAuthStatus() {
-  try {
-    if (!supabase) {
-      console.log('Supabase not configured - auth check bypassed');
-      return { authenticated: false, user: null };
+  console.log('Authentication disabled - returning mock authenticated status');
+  return { 
+    authenticated: true,
+    user: {
+      id: 'default-user-id',
+      name: 'Default User',
+      email: 'user@example.com'
     }
-    
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      return { authenticated: false, user: null };
-    }
-    
-    return { 
-      authenticated: true,
-      user: session.user
-    };
-  } catch (err) {
-    console.error('Error checking authentication status:', err);
-    return { authenticated: false };
-  }
+  };
 }
 
 /**
- * Authenticate with password
+ * Authenticate with password - REMOVED AUTHENTICATION
  * @param {string} password - The password to authenticate with
  * @param {Object} userData - Optional user data for registration
  * @returns {Promise<Object>} - The authentication response
  */
 export async function authenticate(password, userData = null) {
-  try {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
-    }
-    
-    // Require email explicitly from userData
-    const email = userData?.email;
-    
-    if (!email) {
-      throw new Error('Email is required for authentication');
-    }
-    
-    console.log('Attempting login with email:', email);
-    console.log('User data provided:', JSON.stringify(userData, null, 2));
-    
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    
-    if (error) {
-      console.error('Supabase authentication error:', error);
-      throw new Error(`Authentication failed: ${error.message}`);
-    }
-    
-    // Store email for future logins if needed
-    localStorage.setItem('lastEmail', email);
-    
-    return { 
-      success: true,
-      user: data.user,
-      session: data.session
-    };
-  } catch (err) {
-    console.error('Authentication error:', err);
-    throw err;
-  }
+  console.log('Authentication disabled - returning mock authentication response');
+  return { 
+    success: true,
+    user: {
+      id: 'default-user-id',
+      name: 'Default User',
+      email: userData?.email || 'user@example.com'
+    },
+    session: { access_token: 'mock-token' }
+  };
 }
 
 /**
- * Register a new user
+ * Register a new user - REMOVED AUTHENTICATION
  * @param {Object} userData - The user data for registration
  * @returns {Promise<Object>} - The registration response
  */
 export async function register(userData) {
-  try {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
+  console.log('Authentication disabled - returning mock registration response');
+  return { 
+    success: true,
+    user: {
+      id: 'default-user-id',
+      name: userData?.name || 'Default User',
+      email: userData?.email || 'user@example.com'
     }
-    
-    const { email, password, name } = userData;
-    
-    if (!email || !password) {
-      throw new Error('Email and password are required for registration');
-    }
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name
-        }
-      }
-    });
-    
-    if (error) {
-      console.error('Supabase registration error:', error);
-      throw new Error(`Registration failed: ${error.message}`);
-    }
-    
-    // Store email for future logins
-    localStorage.setItem('lastEmail', email);
-    
-    return { 
-      success: true,
-      user: data.user
-    };
-  } catch (err) {
-    console.error('Registration error:', err);
-    throw err;
-  }
+  };
 }
 
 /**
