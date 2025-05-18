@@ -35,7 +35,7 @@ const getNavLinks = (currentUrl) => {
     { 
       key: 'insights',
       label: 'Market Insights', 
-      href: 'https://insights.repspheres.com/dashboard',
+      href: 'https://marketdata.repspheres.com/',
       icon: <InsightsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,
       highlight: true
     },
