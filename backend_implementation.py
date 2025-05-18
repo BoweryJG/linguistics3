@@ -4,11 +4,12 @@ from fastapi.responses import JSONResponse
 import os
 import stripe
 import jwt
-from supabase import create_client
+from supabase import create_client, Client
 from datetime import datetime, timedelta
 import json
 import openai
 from pydantic import BaseModel
+import uuid
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -34,11 +35,17 @@ stripe_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
 # Initialize OpenAI
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
+# Initialize Supabase client
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_KEY")
+supabase_client = create_client(supabase_url, supabase_key) if supabase_url and supabase_key else None
+
 # Define models
 class AudioRequest(BaseModel):
     filename: str
     transcription_url: str = None
     duration_seconds: int = None
+    conversation_id: str = None
 
 class UserLimit(BaseModel):
     tier: str = "free"
@@ -249,11 +256,77 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
             analysis_text = analysis_response.choices[0].message.content
             
             # Step 3: Store the results in Supabase
-            # This would be implemented based on your Supabase schema
+            # Parse the analysis text to extract structured data
+            try:
+                # Extract key components from the analysis text
+                key_points = []
+                pain_points = []
+                objections = []
+                next_steps = []
+                sentiment = "neutral"
+                
+                # Simple parsing logic - in production you'd want more robust parsing
+                for line in analysis_text.split("\n"):
+                    if line.lower().startswith("key point") or "key points" in line.lower():
+                        key_points.append(line.split(":", 1)[1].strip() if ":" in line else line.strip())
+                    elif line.lower().startswith("pain point") or "pain points" in line.lower():
+                        pain_points.append(line.split(":", 1)[1].strip() if ":" in line else line.strip())
+                    elif line.lower().startswith("objection") or "objections" in line.lower():
+                        objections.append(line.split(":", 1)[1].strip() if ":" in line else line.strip())
+                    elif line.lower().startswith("next step") or "next steps" in line.lower():
+                        next_steps.append(line.split(":", 1)[1].strip() if ":" in line else line.strip())
+                    elif "sentiment" in line.lower():
+                        if "positive" in line.lower():
+                            sentiment = "positive"
+                        elif "negative" in line.lower():
+                            sentiment = "negative"
+                
+                # Extract conversation ID from filename if provided
+                conversation_id = None
+                if request.conversation_id:
+                    conversation_id = request.conversation_id
+                
+                # If we have a conversation ID, update its status throughout the process
+                if conversation_id:
+                    # Update to transcribing status
+                    supabase_client.table('conversations').update({'status': 'transcribing'}).eq('id', conversation_id).execute()
+                    
+                    # After transcription, update to analyzing status
+                    supabase_client.table('conversations').update({'status': 'analyzing'}).eq('id', conversation_id).execute()
+                    
+                    # Store results in the new repspheres_linguistics_results table
+                    linguistics_data = {
+                        'conversation_id': conversation_id,
+                        'transcription': transcription_response,
+                        'sentiment': sentiment,
+                        'key_points': key_points,
+                        'pain_points': pain_points,
+                        'objections': objections,
+                        'next_steps': next_steps,
+                        'full_analysis': analysis_text,
+                        'created_at': datetime.utcnow().isoformat()
+                    }
+                    
+                    # Insert the results
+                    linguistics_result = supabase_client.table('repspheres_linguistics_results').insert(linguistics_data).execute()
+                    
+                    # Update conversation status to completed
+                    supabase_client.table('conversations').update({
+                        'status': 'completed',
+                        'duration_seconds': request.duration_seconds if request.duration_seconds else 0
+                    }).eq('id', conversation_id).execute()
+            except Exception as store_error:
+                print(f"Error storing analysis results: {str(store_error)}")
+                if conversation_id:
+                    # Update conversation status to error
+                    supabase_client.table('conversations').update({
+                        'status': 'error',
+                        'error_message': f"Error storing results: {str(store_error)}"
+                    }).eq('id', conversation_id).execute()
             
             return {
                 "message": "Processing completed successfully",
-                "user_id": user_id,
+                "conversation_id": conversation_id,
                 "transcription": transcription_response[:100] + "...",  # Truncated for response
                 "analysis_summary": analysis_text[:100] + "...",  # Truncated for response
                 "usage": {

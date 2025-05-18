@@ -502,7 +502,6 @@ export async function storeParticipant(participantData) {
     return { data };
   } catch (err) {
     console.error('Exception storing participant:', err);
-    return { error: err };
   }
 }
 
@@ -530,6 +529,53 @@ export async function getConversationWithAnalysis(conversationId) {
       return { error: conversationError };
     }
     
+    // Get the linguistics analysis for this conversation
+    const { data: linguistics, error: linguisticsError } = await supabase
+      .from('repspheres_linguistics_results')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (linguisticsError && linguisticsError.code !== 'PGRST116') { // PGRST116 is "Results contain 0 rows" - not a true error
+      console.error('Error fetching linguistics analysis:', linguisticsError);
+      // Continue anyway as we still want to return the conversation
+    }
+
+    // Format the analysis for the frontend
+    let formattedAnalysis = null;
+    
+    if (linguistics) {
+      // Parse JSON string fields if needed
+      const parseJsonField = (field) => {
+        if (!field) return null;
+        if (typeof field === 'string') {
+          try {
+            return JSON.parse(field);
+          } catch (e) {
+            return field;
+          }
+        }
+        return field;
+      };
+      
+      const key_points = parseJsonField(linguistics.key_points) || [];
+      const pain_points = parseJsonField(linguistics.pain_points) || [];
+      const objections = parseJsonField(linguistics.objections) || [];
+      const next_steps = parseJsonField(linguistics.next_steps) || [];
+      
+      formattedAnalysis = {
+        ...linguistics,
+        key_points,
+        pain_points,
+        objections,
+        next_steps,
+        sentiment: linguistics.sentiment || 'neutral',
+        full_analysis: linguistics.full_analysis || ''
+      };
+    }
+
     // Get the behavioral analysis
     const { data: analysis, error: analysisError } = await supabase
       .from('repspheres_behavioral_analysis')
@@ -557,12 +603,54 @@ export async function getConversationWithAnalysis(conversationId) {
       data: { 
         conversation, 
         analysis: analysis || null, 
+        linguistics: formattedAnalysis,
         participants: participants || [] 
       } 
     };
   } catch (err) {
     console.error('Exception getting conversation with analysis:', err);
     return { error: err };
+  }
+}
+
+/**
+ * Store linguistics analysis results in the new table
+ * @param {Object} linguisticsData - The linguistics analysis data
+ * @returns {Promise<Object>} - The Supabase response
+ */
+export async function storeLinguisticsResults(linguisticsData) {
+  if (!supabase) {
+    console.error('Supabase client not initialized');
+    return { data: null, error: 'Supabase client not initialized' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('repspheres_linguistics_results')
+      .insert([
+        {
+          conversation_id: linguisticsData.conversation_id,
+          transcription: linguisticsData.transcription,
+          sentiment: linguisticsData.sentiment || 'neutral',
+          key_points: Array.isArray(linguisticsData.key_points) ? linguisticsData.key_points : [],
+          pain_points: Array.isArray(linguisticsData.pain_points) ? linguisticsData.pain_points : [],
+          objections: Array.isArray(linguisticsData.objections) ? linguisticsData.objections : [],
+          next_steps: Array.isArray(linguisticsData.next_steps) ? linguisticsData.next_steps : [],
+          full_analysis: linguisticsData.full_analysis || linguisticsData.conversation_summary || '',
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.error('Error storing linguistics results:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Exception storing linguistics results:', error);
+    return { data: null, error };
   }
 }
 
@@ -588,7 +676,7 @@ export async function getUserConversations(limit = 10, offset = 0) {
     
     // Get the conversations
     const { data, error, count } = await supabase
-      .from('repspheres_conversations')
+      .from('conversations')
       .select('*', { count: 'exact' })
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -646,6 +734,37 @@ export async function getUserUsageDirectly() {
   }
 }
 
+/**
+ * Get the status of a conversation
+ * @param {string} conversationId - The conversation ID
+ * @returns {Promise<Object>} - The conversation status
+ */
+export async function getConversationStatus(conversationId) {
+  if (!supabase) {
+    console.error('Supabase client not initialized');
+    return { data: null, error: 'Supabase client not initialized' };
+  }
+
+  try {
+    // Get the conversation with just basic fields
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('id, status, error_message')
+      .eq('id', conversationId)
+      .single();
+
+    if (error) {
+      console.error('Error getting conversation status:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Exception getting conversation status:', error);
+    return { data: null, error };
+  }
+}
+
 export default {
   sendRequest,
   logActivity,
@@ -653,14 +772,17 @@ export default {
   authenticate,
   register,
   uploadFile,
+  supabase,
+  getUserToken,
+  getAuthHeaders,
+  getUserUsage,
   createConversation,
   updateConversationStatus,
   storeBehavioralAnalysis,
   storeParticipant,
+  storeLinguisticsResults,
   getConversationWithAnalysis,
   getUserConversations,
-  getUserUsage,
-  getUserUsageDirectly,
-  getMockUserUsage,
+  getConversationStatus,
   supabase
 };
