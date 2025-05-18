@@ -242,13 +242,13 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
             
             # Step 2: Analyze the transcription using OpenAI's GPT-4
             print("Analyzing transcription with GPT-4")
-            analysis_prompt = f"Analyze the following conversation transcript for a sales call:\n\n{transcription_response}\n\nProvide insights on:"
+            analysis_prompt = f"Analyze the following conversation transcript for a sales call with a doctor or medspa owner in the aesthetic or dental industry:\n\n{transcription_response}\n\nProvide insights on:"
             analysis_prompt += "\n1. Key points discussed\n2. Customer pain points\n3. Objections raised\n4. Next steps\n5. Overall sentiment"
             
             analysis_response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are an expert sales conversation analyzer."},
+                    {"role": "system", "content": "You are an expert sales conversation analyzer specializing in medical device and aesthetic product sales to healthcare practitioners."},
                     {"role": "user", "content": analysis_prompt}
                 ]
             )

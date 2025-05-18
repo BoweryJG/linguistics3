@@ -72,7 +72,7 @@ const InsightsView = () => {
               <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2.5 }}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>Conversations Analyzed</Typography>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>Doctor Consultations Analyzed</Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>248</Typography>
                     <Typography variant="h6" sx={{ color: 'success.main', mt: 0.5 }}>+12% from last month</Typography>
                   </Paper>
@@ -80,7 +80,7 @@ const InsightsView = () => {
                 
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2.5 }}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>Avg. Strategy Score</Typography>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>Avg. Close Rate</Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>76.8%</Typography>
                     <Typography variant="h6" sx={{ color: 'success.main', mt: 0.5 }}>+3.2% from last month</Typography>
                   </Paper>
@@ -90,21 +90,21 @@ const InsightsView = () => {
                   <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2.5 }}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>Top Performer</Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>Sarah J.</Typography>
-                    <Typography variant="h6" sx={{ color: 'info.main', mt: 0.5 }}>94.2% strategy score</Typography>
+                    <Typography variant="h6" sx={{ color: 'info.main', mt: 0.5 }}>94.2% conversion rate</Typography>
                   </Paper>
                 </Grid>
                 
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2.5 }}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>Growth Opportunity</Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>Value Articulation</Typography>
+                    <Typography variant="h3" sx={{ fontWeight: 700 }}>ROI Articulation</Typography>
                     <Typography variant="h6" sx={{ color: 'warning.main', mt: 0.5 }}>Team avg: 68.3%</Typography>
                   </Paper>
                 </Grid>
               </Grid>
               
               <Box sx={{ borderTop: '1px solid #e2e8f0', pt: 3 }}>
-                <Typography variant="h4" sx={{ mb: 2, fontWeight: 500 }}>Strategy Execution by Rep</Typography>
+                <Typography variant="h4" sx={{ mb: 2, fontWeight: 500 }}>Sales Performance by Rep</Typography>
                 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -168,28 +168,28 @@ const InsightsView = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Card>
-                <CardHeader title="Skill Development Opportunities" />
+                <CardHeader title="Sales Skills Development" />
                 <CardContent>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>Value Articulation</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>ROI Articulation</Typography>
                         <Typography variant="body2">68.3%</Typography>
                       </Box>
                       <ProgressBar value={68.3} color="warning" />
                       <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                        Team struggles with clearly connecting product features to specific customer pain points.
+                        Team struggles with communicating clear financial benefits to practice owners and medspas.
                       </Typography>
                     </Box>
                     
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>Technical Depth</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>Clinical Knowledge</Typography>
                         <Typography variant="body2">72.1%</Typography>
                       </Box>
                       <ProgressBar value={72.1} color="info" />
                       <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                        More technical training needed to address complex customer questions confidently.
+                        More training needed on procedures and clinical workflows to better connect with doctors.
                       </Typography>
                     </Box>
                     
@@ -200,18 +200,18 @@ const InsightsView = () => {
                       </Box>
                       <ProgressBar value={75.8} color="info" />
                       <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                        Team needs more practice with competitive differentiation objections.
+                        Team needs better responses to pricing objections from aesthetic practices and medspas.
                       </Typography>
                     </Box>
                     
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>Discovery Questions</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>Practice Discovery</Typography>
                         <Typography variant="body2">81.4%</Typography>
                       </Box>
                       <ProgressBar value={81.4} color="success" />
                       <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                        Strong overall, but could improve on uncovering budget constraints earlier.
+                        Strong overall, but could improve on understanding practice-specific pain points earlier.
                       </Typography>
                     </Box>
                   </Box>
@@ -221,7 +221,7 @@ const InsightsView = () => {
             
             <Grid item xs={12} md={6}>
               <Card>
-                <CardHeader title="Conversation Metrics" />
+                <CardHeader title="Doctor Engagement Metrics" />
                 <CardContent>
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={6}>
@@ -232,7 +232,7 @@ const InsightsView = () => {
                           <Typography variant="body2" sx={{ color: 'success.main' }}>(-5%)</Typography>
                         </Box>
                         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                          Rep speaking time
+                          More doctor speaking time
                         </Typography>
                       </Paper>
                     </Grid>
@@ -245,7 +245,7 @@ const InsightsView = () => {
                           <Typography variant="body2" sx={{ color: 'success.main' }}>(-2m)</Typography>
                         </Box>
                         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                          More efficient demos
+                          Respects busy doctor schedules
                         </Typography>
                       </Paper>
                     </Grid>
