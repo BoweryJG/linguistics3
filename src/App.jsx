@@ -1,22 +1,18 @@
 import React, { useState, useRef } from 'react';
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Box,
   Container,
   Avatar,
-  Button,
-  IconButton,
   Menu,
   MenuItem,
   Divider
 } from '@mui/material';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 // Import API service
 import api from './api';
+
+// Import NavBar component
+import NavBar from './components/NavBar';
 
 // Import components
 import DashboardView from './components/DashboardView';
@@ -29,6 +25,7 @@ import SignupDialog from './components/auth/SignupDialog';
 // Import contexts
 import { useTheme } from './contexts/ThemeContext';
 import { useAuth } from './contexts/AuthContext';
+import OrbContextProvider from './OrbContextProvider';
 
 // Main App Component
 const App = () => {
@@ -404,114 +401,18 @@ const App = () => {
   const handleSignupClose = () => setSignupOpen(false);
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      minHeight: '100vh',
-      bgcolor: 'background.default',
-      color: 'text.primary'
-    }}>
-      {/* Navigation Bar */}
-      <AppBar position="static" color="default" elevation={0} sx={{ bgcolor: 'background.paper' }}>
-        <Toolbar>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main', mr: 4 }}>
-            RepSpheres
-          </Typography>
-          
-          {/* Navigation items */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box 
-              onClick={() => handleViewChange('dashboard')} 
-              sx={{ 
-                py: 1.5, 
-                px: 2, 
-                mx: 0.5, 
-                borderRadius: 1.5, 
-                fontWeight: 500, 
-                fontSize: '0.875rem', 
-                cursor: 'pointer', 
-                color: currentView === 'dashboard' ? 'primary.main' : 'text.secondary',
-                bgcolor: currentView === 'dashboard' ? (isDarkMode ? 'rgba(138, 43, 226, 0.1)' : '#ede9fe') : 'transparent',
-                '&:hover': { color: currentView === 'dashboard' ? 'primary.main' : 'text.primary' }
-              }}
-            >
-              Dashboard
-            </Box>
-            <Box 
-              onClick={() => handleViewChange('analyze')} 
-              sx={{ 
-                py: 1.5, 
-                px: 2, 
-                mx: 0.5, 
-                borderRadius: 1.5, 
-                fontWeight: 500, 
-                fontSize: '0.875rem', 
-                cursor: 'pointer', 
-                color: currentView === 'analyze' ? 'primary.main' : 'text.secondary',
-                bgcolor: currentView === 'analyze' ? (isDarkMode ? 'rgba(138, 43, 226, 0.1)' : '#ede9fe') : 'transparent',
-                '&:hover': { color: currentView === 'analyze' ? 'primary.main' : 'text.primary' }
-              }}
-            >
-              New Analysis
-            </Box>
-            <Box 
-              onClick={() => handleViewChange('insights')} 
-              sx={{ 
-                py: 1.5, 
-                px: 2, 
-                mx: 0.5, 
-                borderRadius: 1.5, 
-                fontWeight: 500, 
-                fontSize: '0.875rem', 
-                cursor: 'pointer', 
-                color: currentView === 'insights' ? 'primary.main' : 'text.secondary',
-                bgcolor: currentView === 'insights' ? (isDarkMode ? 'rgba(138, 43, 226, 0.1)' : '#ede9fe') : 'transparent',
-                '&:hover': { color: currentView === 'insights' ? 'primary.main' : 'text.primary' }
-              }}
-            >
-              Team Insights
-            </Box>
-          </Box>
-          
-          {/* Theme toggle and auth */}
-          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Theme toggle */}
-            <IconButton onClick={toggleTheme} color="inherit" sx={{ 
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'rotate(30deg)',
-                color: 'primary.main'
-              }
-            }}>
-              {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-            
-          {/* Always show avatar - no auth section needed */}
-          <Avatar 
-            onClick={handleUserMenuOpen}
-            sx={{ 
-              bgcolor: isDarkMode ? 'primary.main' : '#ede9fe', 
-              color: isDarkMode ? 'white' : 'primary.main', 
-              width: '2rem', 
-              height: '2rem', 
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                bgcolor: 'primary.main',
-                color: 'white',
-                transform: 'scale(1.1)',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-              }
-            }}
-          >
-            {getInitials(user?.name)}
-          </Avatar>
-          </Box>
-        </Toolbar>
-      </AppBar>
+    <OrbContextProvider>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        color: 'text.primary'
+      }}>
+        {/* Navigation Bar */}
+        <NavBar />
 
-      <Container sx={{ py: 4, flex: 1 }}>
+        <Container sx={{ py: 4, flex: 1 }}>
         {/* Subscription Info - Always show */}
         {currentView !== 'complete' && (
           <React.Suspense fallback={<div>Loading subscription info...</div>}>
@@ -548,24 +449,25 @@ const App = () => {
         {currentView === 'insights' && (
           <InsightsView />
         )}
-      </Container>
-      
-      {/* User menu */}
-      <Menu
-        anchorEl={userMenuAnchorEl}
-        open={Boolean(userMenuAnchorEl)}
-        onClose={handleUserMenuClose}
-      >
-        <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleUserMenuClose}>Settings</MenuItem>
-        <Divider />
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-      </Menu>
-      
-      {/* Auth dialogs - hidden but kept for compatibility */}
-      <LoginDialog open={false} onClose={handleLoginClose} />
-      <SignupDialog open={false} onClose={handleSignupClose} />
-    </Box>
+        </Container>
+        
+        {/* User menu */}
+        <Menu
+          anchorEl={userMenuAnchorEl}
+          open={Boolean(userMenuAnchorEl)}
+          onClose={handleUserMenuClose}
+        >
+          <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
+          <MenuItem onClick={handleUserMenuClose}>Settings</MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        </Menu>
+        
+        {/* Auth dialogs - hidden but kept for compatibility */}
+        <LoginDialog open={false} onClose={handleLoginClose} />
+        <SignupDialog open={false} onClose={handleSignupClose} />
+      </Box>
+    </OrbContextProvider>
   );
 };
 
