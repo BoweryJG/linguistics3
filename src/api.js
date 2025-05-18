@@ -676,7 +676,7 @@ export async function getUserConversations(limit = 10, offset = 0) {
     
     // Get the conversations
     const { data, error, count } = await supabase
-      .from('conversations')
+      .from('repspheres_conversations')
       .select('*', { count: 'exact' })
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -748,7 +748,7 @@ export async function getConversationStatus(conversationId) {
   try {
     // Get the conversation with just basic fields
     const { data, error } = await supabase
-      .from('conversations')
+      .from('repspheres_conversations')
       .select('id, status, error_message')
       .eq('id', conversationId)
       .single();

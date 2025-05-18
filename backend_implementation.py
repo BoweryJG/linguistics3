@@ -289,10 +289,10 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
                 # If we have a conversation ID, update its status throughout the process
                 if conversation_id:
                     # Update to transcribing status
-                    supabase_client.table('conversations').update({'status': 'transcribing'}).eq('id', conversation_id).execute()
+                    supabase_client.table('repspheres_conversations').update({'status': 'transcribing'}).eq('id', conversation_id).execute()
                     
                     # After transcription, update to analyzing status
-                    supabase_client.table('conversations').update({'status': 'analyzing'}).eq('id', conversation_id).execute()
+                    supabase_client.table('repspheres_conversations').update({'status': 'analyzing'}).eq('id', conversation_id).execute()
                     
                     # Store results in the new repspheres_linguistics_results table
                     linguistics_data = {
@@ -311,7 +311,7 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
                     linguistics_result = supabase_client.table('repspheres_linguistics_results').insert(linguistics_data).execute()
                     
                     # Update conversation status to completed
-                    supabase_client.table('conversations').update({
+                    supabase_client.table('repspheres_conversations').update({
                         'status': 'completed',
                         'duration_seconds': request.duration_seconds if request.duration_seconds else 0
                     }).eq('id', conversation_id).execute()
@@ -319,7 +319,7 @@ async def webhook(request: AudioRequest, user_id: str = Depends(get_current_user
                 print(f"Error storing analysis results: {str(store_error)}")
                 if conversation_id:
                     # Update conversation status to error
-                    supabase_client.table('conversations').update({
+                    supabase_client.table('repspheres_conversations').update({
                         'status': 'error',
                         'error_message': f"Error storing results: {str(store_error)}"
                     }).eq('id', conversation_id).execute()
