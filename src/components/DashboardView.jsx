@@ -68,7 +68,7 @@ const DashboardView = ({ onUploadClick }) => {
               >
                 <ScoreBadge score={87} />
                 <Box sx={{ ml: 2, flex: 1 }}>
-                  <Typography variant="h4" sx={{ m: 0 }}>Discovery Call - TechCorp</Typography>
+                  <Typography variant="h4" sx={{ m: 0 }}>Discovery Call - Bright Smile Dental</Typography>
                   <Typography variant="body2" sx={{ mt: 0.5 }}>Today at 10:45 AM</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -91,7 +91,7 @@ const DashboardView = ({ onUploadClick }) => {
               >
                 <ScoreBadge score={92} />
                 <Box sx={{ ml: 2, flex: 1 }}>
-                  <Typography variant="h4" sx={{ m: 0 }}>Demo - Acme Industries</Typography>
+                  <Typography variant="h4" sx={{ m: 0 }}>Demo - Radiance MedSpa</Typography>
                   <Typography variant="body2" sx={{ mt: 0.5 }}>Yesterday at 2:15 PM</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -114,7 +114,7 @@ const DashboardView = ({ onUploadClick }) => {
               >
                 <ScoreBadge score={76} />
                 <Box sx={{ ml: 2, flex: 1 }}>
-                  <Typography variant="h4" sx={{ m: 0 }}>Follow-up - Global Financial</Typography>
+                  <Typography variant="h4" sx={{ m: 0 }}>Follow-up - Elite Aesthetics Clinic</Typography>
                   <Typography variant="body2" sx={{ mt: 0.5 }}>Apr 28, 11:30 AM</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
