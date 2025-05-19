@@ -27,7 +27,7 @@ const CompleteView = ({ onNewAnalysis }) => {
     <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h2" sx={{ mb: 0.5, fontSize: '1.5rem', fontWeight: 700 }}>Discovery Call - TechCorp</Typography>
+          <Typography variant="h2" sx={{ mb: 0.5, fontSize: '1.5rem', fontWeight: 700 }}>Discovery Call - Bright Smile Dental</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Schedule fontSize="small" sx={{ color: 'text.secondary' }} />

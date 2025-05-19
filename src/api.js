@@ -536,11 +536,15 @@ export async function getConversationWithAnalysis(conversationId) {
       return { error: conversationError };
     }
     
-    // Get the linguistics analysis for this conversation
+    // Get the linguistics analysis for this conversation - using filename as the relation
+    // First get the file_name from the conversation
+    const fileName = conversation?.file_name || '';
+    
+    // Then get the linguistics analysis that matches this filename
     const { data: linguistics, error: linguisticsError } = await supabase
       .from('repspheres_linguistics_results')
       .select('*')
-      .eq('conversation_id', conversationId)
+      .eq('filename', fileName)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
