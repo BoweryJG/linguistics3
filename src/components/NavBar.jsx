@@ -69,6 +69,11 @@ const getNavLinks = (currentUrl) => {
     });
   }
   
+  // Remove Workspace link if on the workspace page
+  if (currentUrl.includes('/workspace')) {
+    links = links.filter(link => link.key !== 'workspace');
+  }
+
   return links;
 };
 
