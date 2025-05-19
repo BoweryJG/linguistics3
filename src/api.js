@@ -12,6 +12,13 @@ if (supabaseUrl && supabaseKey) {
 // API URL from environment variables
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Debug log for API URL configuration
+console.log('API URL Configuration:', { 
+  VITE_API_URL: import.meta.env.VITE_API_URL, 
+  API_URL: API_URL, 
+  usingDefault: !import.meta.env.VITE_API_URL 
+});
+
 // Previously we used mock data for osbackend-zl1h.onrender.com, but now we'll connect directly
 const isOsBackend = false; // Setting to false to bypass mock data and use real API calls
 
@@ -30,7 +37,7 @@ export async function sendRequest(data, endpoint = '/webhook') {
     // For all backends, try direct connection first
     const url = `${baseUrl}${apiEndpoint}`;
     
-    console.log(`Sending direct request to: ${url}`);
+    console.log(`Sending direct request to:`, url, { baseUrl, apiEndpoint });
     console.log(`Sending payload:`, data);
     
     // Add better error handling with timeouts and retry logic
