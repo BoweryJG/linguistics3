@@ -275,21 +275,6 @@ export default function NavBar() {
           </ListItem>
         ))}
         
-        {/* Theme Toggle in Drawer */}
-        <ListItem disablePadding sx={{ mt: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            width: '100%', 
-            p: 2,
-            borderRadius: '8px',
-            bgcolor: 'rgba(255,255,255,0.05)'
-          }}>
-            <span>Toggle Theme</span>
-            <ThemeToggle />
-          </Box>
-        </ListItem>
       </List>
       
       {/* Auth Buttons */}
@@ -455,20 +440,23 @@ export default function NavBar() {
               Log In
             </Button>
             
-            <Button
-              component="a"
-              href="/signup.html"
-              variant="contained"
-              sx={signupButtonStyles}
-            >
-              Sign Up
-            </Button>
-          </Box>
+          <Button
+            component="a"
+            href="/signup.html"
+            variant="contained"
+            sx={signupButtonStyles}
+          >
+            Sign Up
+          </Button>
+        </Box>
 
-          {/* Mobile Menu Button */}
-          {isMobile && (
-            <IconButton 
-              edge="end" 
+        {/* Theme Toggle - visible on all screen sizes */}
+        <ThemeToggle />
+
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <IconButton
+            edge="end"
               color="inherit" 
               aria-label="menu"
               onClick={toggleDrawer(true)}
@@ -521,19 +509,6 @@ export default function NavBar() {
               }
             }}
           >
-            {/* Theme Toggle */}
-            <MenuItem onClick={handleMenuClose}>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
-                width: '100%',
-                color: '#fff'
-              }}>
-                <span>Toggle Theme</span>
-                <ThemeToggle />
-              </Box>
-            </MenuItem>
 
             <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
 
