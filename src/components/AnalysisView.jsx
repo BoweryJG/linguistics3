@@ -60,7 +60,10 @@ const AnalysisView = ({
               sx={{ 
                 p: 3, 
                 mb: 3, 
-                bgcolor: '#fff8e1', 
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.warning.dark
+                    : theme.palette.warning.light,
                 borderRadius: 2,
                 border: '1px solid #ffd54f',
                 display: 'flex',
@@ -107,9 +110,12 @@ const AnalysisView = ({
                 textAlign: 'center', 
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                '&:hover': { 
+                '&:hover': {
                   borderColor: 'primary.main',
-                  bgcolor: '#f8fafc' 
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.action.hover
+                      : '#f8fafc'
                 }
               }}
             >

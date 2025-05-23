@@ -63,7 +63,12 @@ const DashboardView = ({ onUploadClick }) => {
                   border: '1px solid #e2e8f0', 
                   borderRadius: 2,
                   transition: 'all 0.2s',
-                  '&:hover': { bgcolor: '#f8fafc' }
+                  '&:hover': {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.action.hover
+                        : '#f8fafc'
+                  }
                 }}
               >
                 <ScoreBadge score={87} />
@@ -86,7 +91,12 @@ const DashboardView = ({ onUploadClick }) => {
                   border: '1px solid #e2e8f0', 
                   borderRadius: 2,
                   transition: 'all 0.2s',
-                  '&:hover': { bgcolor: '#f8fafc' }
+                  '&:hover': {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.action.hover
+                        : '#f8fafc'
+                  }
                 }}
               >
                 <ScoreBadge score={92} />
@@ -109,7 +119,12 @@ const DashboardView = ({ onUploadClick }) => {
                   border: '1px solid #e2e8f0', 
                   borderRadius: 2,
                   transition: 'all 0.2s',
-                  '&:hover': { bgcolor: '#f8fafc' }
+                  '&:hover': {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.action.hover
+                        : '#f8fafc'
+                  }
                 }}
               >
                 <ScoreBadge score={76} />
@@ -140,9 +155,12 @@ const DashboardView = ({ onUploadClick }) => {
                 textAlign: 'center', 
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                '&:hover': { 
+                '&:hover': {
                   borderColor: 'primary.main',
-                  bgcolor: '#f8fafc' 
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.action.hover
+                      : '#f8fafc'
                 }
               }}
             >
@@ -173,7 +191,15 @@ const DashboardView = ({ onUploadClick }) => {
               <Typography variant="h3" sx={{ mb: 2 }}>Performance Metrics</Typography>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2 }}>
+                  <Paper
+                    sx={{
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.background.paper
+                          : '#f8fafc',
+                      borderRadius: 2,
+                      p: 2
+                    }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                       <Typography variant="body2">Strategy Score</Typography>
                       <Badge variant="success">+12%</Badge>
@@ -183,7 +209,15 @@ const DashboardView = ({ onUploadClick }) => {
                 </Grid>
                 
                 <Grid item xs={6}>
-                  <Paper sx={{ bgcolor: '#f8fafc', borderRadius: 2, p: 2 }}>
+                  <Paper
+                    sx={{
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.background.paper
+                          : '#f8fafc',
+                      borderRadius: 2,
+                      p: 2
+                    }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                       <Typography variant="body2">Calls Analyzed</Typography>
                       <Badge variant="info">This Week</Badge>
@@ -206,7 +240,10 @@ const DashboardView = ({ onUploadClick }) => {
                 <Paper 
                   onClick={() => toggleSection('psychology')}
                   sx={{ 
-                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'background.paper' : '#f8fafc', 
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.background.paper
+                        : '#f8fafc',
                     borderRadius: 2, 
                     p: 2.5,
                     cursor: 'pointer',
@@ -335,7 +372,10 @@ const DashboardView = ({ onUploadClick }) => {
                 <Paper 
                   onClick={() => toggleSection('persuasion')}
                   sx={{ 
-                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'background.paper' : '#f8fafc', 
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.background.paper
+                        : '#f8fafc',
                     borderRadius: 2, 
                     p: 2.5,
                     cursor: 'pointer',
@@ -455,7 +495,10 @@ const DashboardView = ({ onUploadClick }) => {
                 <Paper 
                   onClick={() => toggleSection('strategic')}
                   sx={{ 
-                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'background.paper' : '#f8fafc', 
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.background.paper
+                        : '#f8fafc',
                     borderRadius: 2, 
                     p: 2.5,
                     cursor: 'pointer',
