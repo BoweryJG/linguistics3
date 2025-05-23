@@ -31,7 +31,10 @@ const InsightsView = ({ analysisResults }) => {
             <Box
               sx={{
                 p: 3,
-                bgcolor: '#fff8e1',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.warning.dark
+                    : theme.palette.warning.light,
                 borderRadius: 2,
                 border: '1px solid #ffd54f',
                 display: 'flex',
